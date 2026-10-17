@@ -6,4 +6,6 @@ export default defineConfig({
       theme: 'rose-pine-dawn',
     },
   },
+  site: 'https://vanbasten23.github.io',
+  base: '/xavier-blog',
 });
