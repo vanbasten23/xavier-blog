@@ -1,10 +1,7 @@
-# Astro Starter Kit: Basics
+# Xavier Wei's Technical Blogs
 
-```sh
-npm create astro@latest -- --template basics
-```
-
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Websites:
+- https://vanbasten23.github.io/xavier-blog/blog/fused_moe_v2_explained/
 
 ## 🚀 Project Structure
 
