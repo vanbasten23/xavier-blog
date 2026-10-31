@@ -1,4 +1,11 @@
-# Roofline Analysis: tgmm_v2 on TPU v7x (ghostfish), test_tgmm_perf_baseline
+---
+layout: ../../layouts/Layout.astro
+title: "Roofline Analysis: tgmm_v2 on TPU v7x"
+description: "A step-by-step roofline analysis of the tgmm_v2 kernel on TPU v7x"
+pubDate: 2026-10-15
+---
+
+# Roofline Analysis: tgmm_v2 on TPU v7x, test_tgmm_perf_baseline
 
 Measured kernel runtime: 6529.78 us
 
@@ -243,7 +250,7 @@ Bottleneck classification:
 
 1. Which peak FLOP/s should we use?
    - xprof's built-in roofline tool uses peak_flop_rate = 1028.75 TFLOP/s and
-     peak_hbm_bw = 3433 GiB/s (about 3686 GB/s) for GhostFish.
+     peak_hbm_bw = 3433 GiB/s (about 3686 GB/s) for TPU v7x.
    - The public spec and tpu_info give 1153.5 / 1155 TFLOP/s.
    - This analysis uses the public spec (1153.5).
    - Against xprof's peak, the roofline is 3741 us, which is 57% efficiency.

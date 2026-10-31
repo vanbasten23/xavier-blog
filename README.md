@@ -1,43 +1,30 @@
-# Xavier Wei's Technical Blogs
+# Xavier Wei's Technical Blogs about AI infra, TPU kernels, LLM inference and more.
 
-Websites:
-- https://vanbasten23.github.io/xavier-blog/blog/fused_moe_v2_explained/
+Website: https://vanbasten23.github.io/xavier-blog/
 
-## 🚀 Project Structure
+Contact: isaacwxf23@gmail.com
 
-Inside of your Astro project, you'll see the following folders and files:
+## Writing a post
 
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
+Add a Markdown file to `src/pages/blog/`. It shows up on the homepage automatically. Start it with:
+
+```yaml
+---
+layout: ../../layouts/Layout.astro
+title: "Post title"
+description: "One-line summary"
+pubDate: 2026-10-31
+---
 ```
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+Put images in `public/images/` and reference them as `/images/<name>.png`.
 
-## 🧞 Commands
+## Running locally
 
-All commands are run from the root of the project, from a terminal:
+```sh
+npm install
+npm run dev      # http://localhost:4321/xavier-blog/
+npm run build    # outputs to ./dist/
+```
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+Pushing to `main` deploys to GitHub Pages.
