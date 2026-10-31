@@ -1,6 +1,8 @@
-# Xavier Wei's Technical Blogs
+# Xavier Wei's Technical Blogs about AI infra, TPU kernels, LLM inference and more.
 
 Website: https://vanbasten23.github.io/xavier-blog/
+
+Contact: isaacwxf23@gmail.com
 
 ## Writing a post
 
