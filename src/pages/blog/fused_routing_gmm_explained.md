@@ -260,7 +260,7 @@ Here are two hardware-level tricks in `config.py` and `vmem_ldst.py` that make r
 
 - Trick 5A: Why is buf_shape = (tile_m, blocks | 1, 2, 128) padded to an ODD block count?
 <img
-  src="/images/fused_routing_gmm/3_step5_a"
+  src="/images/fused_routing_gmm/3_step5_a.png"
   width="700"
 />
 - Trick 5B: How load_rows & store_rows Unpack/Pack 32-bit Words
