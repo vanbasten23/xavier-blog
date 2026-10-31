@@ -1,5 +1,8 @@
 ---
 const base = import.meta.env.BASE_URL.endsWith("/") ? import.meta.env.BASE_URL : import.meta.env.BASE_URL + "/";
+// Pages pass `title`; Markdown posts using this layout pass their `frontmatter`.
+const { title, frontmatter } = Astro.props;
+const pageTitle = title ?? frontmatter?.title ?? "Xavier Wei's Technical Blog";
 ---
 
 <!doctype html>
@@ -10,10 +13,11 @@ const base = import.meta.env.BASE_URL.endsWith("/") ? import.meta.env.BASE_URL :
 		<link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
 		<link rel="icon" href={`${base}favicon.ico`} />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
+		<title>{pageTitle}</title>
 	</head>
   <body>
     <main>
+      {frontmatter && <nav class="home-link"><a href={base}>&larr; All posts</a></nav>}
       <slot />
     </main>
   </body>
@@ -71,6 +75,11 @@ const base = import.meta.env.BASE_URL.endsWith("/") ? import.meta.env.BASE_URL :
 
   h1 {
     margin-top: 0;
+  }
+
+  .home-link {
+    margin-bottom: 24px;
+    font-size: 0.9em;
   }
 
   /* Links */
