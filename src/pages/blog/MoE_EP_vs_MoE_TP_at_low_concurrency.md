@@ -1,11 +1,11 @@
 ---
 layout: ../../layouts/Layout.astro
-title: "MoE EP vs MoE TP at low concurrency — stupidly simple version"
+title: "MoE EP vs MoE TP at low concurrency — simple version"
 description: "Why expert parallelism and tensor parallelism behave differently for MoE decode at low concurrency"
 pubDate: 2026-10-15
 ---
 
-# MoE EP vs MoE TP at low concurrency — stupidly simple version
+# MoE EP vs MoE TP at low concurrency — simple version
 
 ## 1. What is "low concurrency" and why is it a different world
 
