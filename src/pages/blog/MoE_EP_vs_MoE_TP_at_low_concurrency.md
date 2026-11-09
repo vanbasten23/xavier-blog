@@ -1,11 +1,40 @@
 ---
 layout: ../../layouts/Layout.astro
-title: "MoE EP vs MoE TP at low concurrency — simple version"
-description: "Why expert parallelism and tensor parallelism behave differently for MoE decode at low concurrency"
+title: "MoE EP vs MoE TP at low concurrency"
+description: "A simple explanation of MoE EP vs TP at low concurrency"
 pubDate: 2026-10-15
 ---
 
-# MoE EP vs MoE TP at low concurrency — simple version
+# MoE EP vs MoE TP at low concurrency
+
+Takeaway:
+
+1. Concepts:
+  - "Concurrency" = how many requests are being decoded at once. Each decode step produces **one token per request**.
+2. Characteristics:
+
+    2.1 decode
+    - At high concurrency, a majority of experts are hit and their weights are loaded by the devices. With EP, every device loads bytes_all_weights/EP. With TP, every device loads bytes_all_weights/EP. With TP=EP=num_devices, weight loading is a tie. What is left is:
+      - EP: big matmuls and an all-to-all
+      - TP: thin matmul (every device does every row at 1/4 width) and all-reduce of every output row.
+    
+      So you want the big dense matmul that EP gives you.
+  
+    - At low concurrency, only a minority of experts are hit and the token picks tends to be skewed. The overall time is the max over devices. On each device, the time is spent on reading the expert weights. (see the section "2. Toy example" for an example)
+      - TP: each device loads bytes_activated_expert_weights/TP. If num_devices=16 and only 2 experts are activated, then each device load `num_activated_experts*weight_per_expert/TP=2*weight_per_expert/16`
+      - EP: when skewed, the skewed devices may contain all num_activated_experts. So this skewed device loads `num_activated_experts*weight_per_expert=2*weight_per_expert`.
+  
+    2.2 prefill
+  
+    Regardless of high or low concurrency, EP wins.
+
+3. Conclusion
+
+  Strictly speaking the real axis isn't "concurrency" at all, it's **how many tokens the MoE layer sees in that step**, which is what decides **whether the step is weight‑read‑bound or compute/network‑bound**. Concurrency **only matters through decode**
+|  | Prefill step (≥1024 tokens in the layer, even if one request) | Decode step (C tokens in the layer) |
+|---|---|---|
+| Low concurrency (C ≲ 64) | Compute + network bound. EP: wide matmuls, ~4× fewer bytes, imbalance by token count per expert (≈2× worst, fixable with EPLB). TP: balanced but thin matmuls, exposed reduce‑scatter. **EP wins**. Prefill is bursty here (one engine prefills, 15 decode) but both schemes still spread it over 16 devices. | **Weight‑read bound**. Few tokens → only some experts hit → EP straggler = device with most hit experts (≈1.3–1.8× for DSV4‑Pro); TP reads 1/16 of every hit expert, balanced. Collectives: 2 vs 2, latency‑bound, a wash. **TP wins — this is the only cell where it does.** |
+| High concurrency (C ≳ 256) | Same as above, just bigger. **EP wins** | Enough tokens that ~all experts are hit on every device → weight reads equal. Now matmul width and bytes decide → **EP wins** |
 
 ## 1. What is "low concurrency" and why is it a different world
 
@@ -75,13 +104,13 @@ device reads 8 x W/4 = 2W. **Weight reading is a tie.** What's left is:
 - TP: thin matmuls (every device does *every* row at 1/4 width) + a 4-way
   all-reduce of **every** output row.
 
-EP wins. That is why the fused-EP kernel is +42% at C=2048 on DSV4-Pro.
+EP wins.
 
 ## 3. Put DSV4-Pro numbers in (384 experts, top-6, 16 devices, 24 experts/device)
 
 Assume uniform routing (real routing is skewier, which makes EP look *worse*,
-not better). Picks per step = `tokens x 6`. Probability an expert is hit =
-`1 - (1 - 6/384)^tokens`.
+not better). Picks per step = `tokens x 6`. **Probability an expert is hit =
+`1 - (1 - 6/384)^tokens`**.
 
 | C | tokens | % experts hit | EP: hit experts on the *busiest* device (of 24) | TP: expert-equivalents per device | EP/TP straggler ratio (approx) |
 |---|---|---|---|---|---|
@@ -104,12 +133,6 @@ is needed rather than this table.
 
 ## 4. Why you cannot just "switch to TP for decode" for free
 
-```mermaid
-flowchart TD
-  EP["EP layout in HBM<br/>device d holds experts 24d..24d+23, full width"]
-  TP["TP layout in HBM<br/>device d holds columns d/16 of all 384 experts"]
-  EP -. "different bytes on every device" .-> TP
-```
 
 Both layouts are the same *size* per device, but they are *different bytes*.
 Options:
